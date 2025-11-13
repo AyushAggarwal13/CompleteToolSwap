@@ -10,7 +10,6 @@ import bookingRoutes from "./routes/bookingRoutes.js";
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 import User from "./models/userModel.js";
 import userRouter from "./routes/userRoutes.js"; 
-// Assuming you renamed cronJobs.js to cronService.js
 import cronJob from "./services/cronService.js";
 
 dotenv.config();

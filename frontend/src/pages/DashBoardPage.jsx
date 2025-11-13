@@ -128,7 +128,9 @@ useEffect(() => {
             {bookingsAsOwner.map(booking => (
               <li key={booking._id} className="border-b py-3 flex justify-between items-center">
                 <div>
+                {/*
                   <p><span className="font-semibold">{booking.borrower.name}</span> wants to borrow <span className="font-semibold">{booking.tool.name}</span></p>
+                */}
                   <p className="text-sm text-gray-500">Status: {booking.status}</p>
                   <p className="text-xs text-gray-400">
                     From: {formatDateTime(booking.startDate)} to {formatDateTime(booking.endDate)}
