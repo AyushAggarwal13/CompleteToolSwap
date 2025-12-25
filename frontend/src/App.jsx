@@ -4,7 +4,7 @@ import Header from './components/Header';
 import HomePage from './pages/HomePage';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
-import DashboardPage from './pages/DashboardPage';
+import DashBoardPage from './pages/DashBoardPage';
 import AddToolPage from './pages/AddToolPage';
 import ToolDetailPage from './pages/ToolDetailPage';
 import ProfilePage from './pages/ProfilePage';
@@ -22,7 +22,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/dashboard" element={<DashBoardPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           {/* New route for editing a tool */}
           <Route path="/tool/:id/edit" element={<EditToolPage />} />
