@@ -14,20 +14,19 @@ import cronJob from "./services/cronService.js";
 
 dotenv.config();
 
-const startServer = async () => {
-  const isConnected = await connectDB();
-  if (isConnected) {
-    cronJob.start();
-    console.log('Cron job started');
-  } else {
-    console.log('Cron job disabled (MongoDB not connected)');
-  }
-};
 
+const startServer = async () => {
+  await connectDB();
+};
 startServer();
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: [
+    "https://completetoolswap-frontend.onrender.com"
+  ],
+  credentials: true
+}));
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
@@ -45,7 +44,12 @@ app.use(errorHandler);
 const server = http.createServer(app);
 
 const io = new Server(server, {
-  cors: { origin: "*" },
+  cors: {
+    origin: [
+      "https://completetoolswap-frontend.onrender.com"
+    ],
+    credentials: true
+  }
 });
 
 const activeUsers = {};
