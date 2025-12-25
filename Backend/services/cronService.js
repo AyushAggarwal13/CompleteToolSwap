@@ -2,8 +2,15 @@ import cron from 'node-cron';
 import Booking from '../models/bookingModel.js';
 import Tool from '../models/toolModel.js';
 import { io, activeUsers } from '../index.js';
+import mongoose from 'mongoose';
 
 const job = cron.schedule('* * * * *', async () => {
+    // Skip if MongoDB is not connected
+    if (mongoose.connection.readyState !== 1) {
+        console.log('Skipping cron job - MongoDB not connected');
+        return;
+    }
+    
     console.log('Running cron job to check for expired bookings...');
     const now = new Date();
 

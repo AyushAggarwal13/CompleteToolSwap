@@ -9,7 +9,7 @@ const AddToolPage = () => {
   const [description, setDescription] = useState('');
   const [condition, setCondition] = useState('Good');
   const [image, setImage] = useState(null);
-  // Using hardcoded location for simplicity. In a real app, you'd use a map picker.
+  // Using hardcoded location for simplicity.
   const [location] = useState({ longitude: 77.216721, latitude: 28.644800 });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -17,7 +17,6 @@ const AddToolPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  // If the user is not logged in, redirect them to the login page
   if (!user) {
     navigate('/login');
     return null;
@@ -33,7 +32,7 @@ const AddToolPage = () => {
     setLoading(true);
     setError('');
 
-    // We use FormData because we are sending a file (image)
+    // Prepare FormData object
     const formData = new FormData();
     formData.append('name', name);
     formData.append('category', category);
@@ -41,57 +40,72 @@ const AddToolPage = () => {
     formData.append('condition', condition);
     formData.append('longitude', location.longitude);
     formData.append('latitude', location.latitude);
+    // The key 'image' must match the backend upload.single('image') middleware
     formData.append('image', image);
 
     try {
-      // Send the form data to the backend API
-      await api.post('/tools', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      // FIX: Rely on axios to set the correct 'Content-Type': 'multipart/form-data' header automatically.
+      await api.post('/tools', formData);
+      
       // Navigate to the homepage on success
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to list tool.');
+      // Log the full error response for debugging the backend crash
+      console.error("Tool listing failed:", err.response?.data || err);
+      setError(err.response?.data?.message || 'Failed to list tool. Check your Cloudinary setup.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-lg mx-auto mt-10 bg-white p-8 rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-center">List a New Tool</h2>
-      {error && <p className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block text-gray-700">Tool Name</label>
-          <input type="text" value={name} onChange={(e) => setName(e.target.value)} required className="w-full px-3 py-2 border rounded-lg" />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700">Category</label>
-          <input type="text" value={category} onChange={(e) => setCategory(e.target.value)} required className="w-full px-3 py-2 border rounded-lg" />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700">Description</label>
-          <textarea value={description} onChange={(e) => setDescription(e.target.value)} required className="w-full px-3 py-2 border rounded-lg" />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700">Condition</label>
-          <select value={condition} onChange={(e) => setCondition(e.target.value)} className="w-full px-3 py-2 border rounded-lg">
-            <option>New</option>
-            <option>Good</option>
-            <option>Fair</option>
-          </select>
-        </div>
-        <div className="mb-6">
-          <label className="block text-gray-700">Tool Image</label>
-          <input type="file" onChange={(e) => setImage(e.target.files[0])} required className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
-        </div>
-        <button type="submit" disabled={loading} className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:bg-blue-300 transition-colors">
-          {loading ? 'Listing...' : 'List Tool'}
-        </button>
-      </form>
+    <div className="max-w-xl mx-auto mt-12">
+      {/* Container with modern glassmorphism effect and shadow */}
+      <div className="bg-white/70 dark:bg-gray-800/80 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 p-10 rounded-2xl shadow-2xl">
+        <h2 className="text-3xl font-extrabold mb-8 text-center text-gray-900 dark:text-white">List a New Tool</h2>
+        
+        {error && <p className="bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 p-3 rounded-lg mb-6 border border-red-300 dark:border-red-700">{error}</p>}
+        
+        <form onSubmit={handleSubmit}>
+          <div className="mb-6">
+            <label className="block text-gray-700 dark:text-gray-300 font-medium mb-2">Tool Name</label>
+            <input type="text" value={name} onChange={(e) => setName(e.target.value)} required className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white/90 dark:bg-gray-900 dark:text-white" />
+          </div>
+          <div className="mb-6">
+            <label className="block text-gray-700 dark:text-gray-300 font-medium mb-2">Category</label>
+            <input type="text" value={category} onChange={(e) => setCategory(e.target.value)} required className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white/90 dark:bg-gray-900 dark:text-white" />
+          </div>
+          <div className="mb-6">
+            <label className="block text-gray-700 dark:text-gray-300 font-medium mb-2">Description</label>
+            <textarea value={description} onChange={(e) => setDescription(e.target.value)} required rows="4" className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white/90 dark:bg-gray-900 dark:text-white" />
+          </div>
+          <div className="mb-6">
+            <label className="block text-gray-700 dark:text-gray-300 font-medium mb-2">Condition</label>
+            <select value={condition} onChange={(e) => setCondition(e.target.value)} className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white/90 dark:bg-gray-900 dark:text-white appearance-none">
+              <option>New</option>
+              <option>Good</option>
+              <option>Fair</option>
+            </select>
+          </div>
+          <div className="mb-8">
+            <label className="block text-gray-700 dark:text-gray-300 font-medium mb-2">Tool Image</label>
+            <input 
+              type="file" 
+              onChange={(e) => setImage(e.target.files[0])} 
+              required 
+              className="w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-100 dark:file:bg-indigo-900 file:text-indigo-700 dark:file:text-indigo-300 hover:file:bg-indigo-200 dark:hover:file:bg-indigo-800 cursor-pointer"
+            />
+          </div>
+          
+          <button 
+            type="submit" 
+            disabled={loading} 
+            className="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold interactive-button hover:bg-indigo-700 shadow-lg disabled:bg-gray-400 dark:bg-indigo-500 dark:hover:bg-indigo-600"
+          >
+            {loading ? 'Listing...' : 'List Tool'}
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

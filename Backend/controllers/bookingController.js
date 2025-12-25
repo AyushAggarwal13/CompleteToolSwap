@@ -27,20 +27,22 @@ export const createBookingRequest = async (req, res, next) => {
       endDate,
     });
 
-    // --- THIS IS THE FIX ---
-    // Get the owner's full info object from activeUsers
+    // --- LOGIC FOR REAL-TIME NOTIFICATION TO OWNER ---
     const ownerInfo = activeUsers[tool.owner.toString()];
     if (ownerInfo) {
-      // Use the .socketId property to send the notification
       io.to(ownerInfo.socketId).emit('new_booking_request', {
         message: `You have a new booking request for your tool: ${tool.name}`,
-        bookingDetails: booking,
+        bookingDetails: { 
+          ...booking._doc, 
+          tool: { _id: tool._id, name: tool.name }, // Populate minimal info
+          borrower: { _id: req.user._id, name: req.user.name } // Add borrower info
+        },
       });
       console.log(`Notification sent to owner ${tool.owner}`);
     } else {
       console.log(`Owner ${tool.owner} is not online.`);
     }
-    // --- END OF FIX ---
+    // --- END OF REAL-TIME LOGIC ---
 
     res.status(201).json(booking);
   } catch (error) {
@@ -83,7 +85,7 @@ export const updateBookingStatus = async (req, res, next) => {
     booking.status = status;
     await booking.save();
     
-    // Your excellent logic to make the tool unavailable
+    // Update tool availability
     if (status === 'approved') {
         const tool = await Tool.findById(booking.tool._id);
         if (tool) {
@@ -92,11 +94,9 @@ export const updateBookingStatus = async (req, res, next) => {
         }
     }
 
-    // --- THIS IS THE FIX ---
-    // Get the borrower's full info object
+    // --- LOGIC FOR REAL-TIME NOTIFICATION TO BORROWER ---
     const borrowerInfo = activeUsers[booking.borrower.toString()];
     if (borrowerInfo) {
-      // Use the .socketId property to send the notification
       io.to(borrowerInfo.socketId).emit('booking_status_updated', {
         message: `Your request for "${booking.tool.name}" has been ${status}.`,
         bookingDetails: booking,
@@ -105,7 +105,7 @@ export const updateBookingStatus = async (req, res, next) => {
     } else {
       console.log(`Borrower ${booking.borrower} is not online.`);
     }
-    // --- END OF FIX ---
+    // --- END OF REAL-TIME LOGIC ---
 
     res.json(booking);
   } catch (error) {

@@ -6,7 +6,7 @@ const generateToken = (id) => {
     expiresIn: '30d',
   });
 };
-export const registerUser = async (req, res) => {
+export const registerUser = async (req, res, next) => {
   const { name, email, password } = req.body;
   try {
     const userExists = await User.findOne({ email });

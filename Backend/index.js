@@ -9,12 +9,22 @@ import toolRoutes from "./routes/toolRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 import User from "./models/userModel.js";
-import userRouter from "./routes/userRoutes.js"; 
+import userRouter from "./routes/userRoutes.js";
 import cronJob from "./services/cronService.js";
 
 dotenv.config();
-connectDB();
-cronJob.start(); // Start the background job
+
+const startServer = async () => {
+  const isConnected = await connectDB();
+  if (isConnected) {
+    cronJob.start();
+    console.log('Cron job started');
+  } else {
+    console.log('Cron job disabled (MongoDB not connected)');
+  }
+};
+
+startServer();
 
 const app = express();
 app.use(cors());
@@ -23,7 +33,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/tools", toolRoutes);
 app.use("/api/bookings", bookingRoutes);
-app.use("/api/users", userRouter); 
+app.use("/api/users", userRouter);
 
 app.get("/", (req, res) => {
   res.send("ToolSwap API is running...");
@@ -38,10 +48,10 @@ const io = new Server(server, {
   cors: { origin: "*" },
 });
 
-const activeUsers = {}; // Stores { userId: { socketId, name } }
+const activeUsers = {};
 
 io.on("connection", (socket) => {
-  console.log(`--- A user connected with socket ID: ${socket.id} ---`);
+  console.log(`A user connected with socket ID: ${socket.id}`);
 
   socket.on("add_user", async (userId) => {
     try {

@@ -7,10 +7,14 @@ import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import AddToolPage from './pages/AddToolPage';
 import ToolDetailPage from './pages/ToolDetailPage';
+import ProfilePage from './pages/ProfilePage';
+import EditToolPage from './pages/EditToolPage';
+
 
 function App() {
   return (
-    <div className="bg-gray-100 min-h-screen">
+    // Updated container with custom background and dark mode
+    <div className="modern-background min-h-screen dark:bg-gray-900 dark:text-gray-200 text-gray-900 transition-colors duration-500"> 
       <Header />
       <main className="container mx-auto p-4">
 
@@ -19,6 +23,9 @@ function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          {/* New route for editing a tool */}
+          <Route path="/tool/:id/edit" element={<EditToolPage />} />
           <Route path="/add-tool" element={<AddToolPage />} />
           <Route path="/tool/:id" element={<ToolDetailPage />} />
 
